@@ -1,22 +1,21 @@
 package com.backend.proyect.model.pedido;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import com.backend.proyect.model.productos.Stock;
-import com.backend.proyect.model.carrito.Carrito;
-import com.backend.proyect.model.metodoPagos.MetodoPago;
-import com.backend.proyect.model.promociones.Promocion;
 import com.backend.proyect.model.usuario.Usuario;
+import com.backend.proyect.model.promociones.Promocion;
+import com.backend.proyect.model.metodoPagos.MetodoPago;
+import com.backend.proyect.model.carrito.Carrito;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Data
 @Entity
 @Table(name = "Pedido")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Pedido {
 
     @Id
@@ -43,10 +42,22 @@ public class Pedido {
     @JoinColumn(name = "idMetodoPago", nullable = false)
     private MetodoPago metodoPago;
 
-    @ManyToOne
-    @JoinColumn(name = "idEstadoPedido", nullable = false)
-    private EstadoPedido estadoPedido;
+    @Column(name = "estado", columnDefinition = "ENUM('Pendiente', 'En proceso', 'Entregado')")
+    private String estado;
 
-        @Column(name = "total_final", nullable = false, precision = 10, scale = 2)
-        private BigDecimal totalFinal;
+    @Column(name = "total_final", nullable = false, precision = 10, scale = 2)
+    private BigDecimal totalFinal;
+
+    @PrePersist
+    public void prePersist() {
+        if (fechaPedido == null) {
+            fechaPedido = LocalDate.now();
+        }
+        if (estado == null) {
+            estado = "Pendiente";
+        }
+        if (totalFinal == null) {
+            totalFinal = BigDecimal.ZERO;
+        }
     }
+}
